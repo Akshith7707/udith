@@ -154,34 +154,40 @@
   animation: spin 0.9s linear infinite;
 }
 
-/* Guidance marquee — infinite left-to-right scroll */
+/* Guidance marquee — manual scroll + auto-scroll when idle */
 .guidance-marquee-mask {
   overflow: hidden;
   mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
 }
 
-.guidance-marquee-track {
-  animation: guidanceMarquee 45s linear infinite;
-  will-change: transform;
+.guidance-marquee-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scroll-behavior: auto;
+  cursor: grab;
+  touch-action: pan-x;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
-.guidance-marquee-mask:hover .guidance-marquee-track {
-  animation-play-state: paused;
+.guidance-marquee-scroll.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
 }
 
-@keyframes guidanceMarquee {
-  from {
-    transform: translateX(-50%);
-  }
-  to {
-    transform: translateX(0);
-  }
+.guidance-marquee-scroll:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 12px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .guidance-marquee-track {
-    animation: none;
+  .guidance-marquee-scroll {
     flex-wrap: wrap;
     justify-content: center;
     width: auto;
@@ -189,6 +195,8 @@
     margin: 0 auto;
     padding: 0 1rem;
     gap: 1rem;
+    overflow-x: visible;
+    cursor: default;
   }
 
   .guidance-marquee-mask {
