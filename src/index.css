@@ -154,24 +154,30 @@
   animation: spin 0.9s linear infinite;
 }
 
-/* Guidance marquee — manual scroll + auto-scroll when idle */
+/* Guidance marquee — scroll viewport + wide track */
 .guidance-marquee-mask {
+  width: 100%;
   overflow: hidden;
-  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
 }
 
 .guidance-marquee-scroll {
+  width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x proximity;
-  scroll-behavior: auto;
   cursor: grab;
   touch-action: pan-x;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
   scrollbar-width: thin;
   scrollbar-color: var(--border-strong) transparent;
   -webkit-overflow-scrolling: touch;
+}
+
+.guidance-marquee-track {
+  width: max-content;
+  padding-inline: 4px;
 }
 
 .guidance-marquee-scroll.is-dragging {
@@ -188,21 +194,22 @@
 
 @media (prefers-reduced-motion: reduce) {
   .guidance-marquee-scroll {
+    overflow-x: auto;
+    cursor: default;
+  }
+
+  .guidance-marquee-track {
     flex-wrap: wrap;
     justify-content: center;
     width: auto;
     max-width: 72rem;
     margin: 0 auto;
     padding: 0 1rem;
-    gap: 1rem;
-    overflow-x: visible;
-    cursor: default;
   }
 
   .guidance-marquee-mask {
     mask-image: none;
     -webkit-mask-image: none;
-    overflow: visible;
   }
 }
 

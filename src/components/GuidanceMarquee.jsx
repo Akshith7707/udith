@@ -16,12 +16,12 @@ function PersonCard({ person }) {
       <img
         src={person.image}
         alt={person.name}
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
         loading="lazy"
         draggable={false}
       />
       <div
-        className="absolute inset-x-0 bottom-0 px-3 py-3 pt-10 pointer-events-none"
+        className="absolute inset-x-0 bottom-0 px-3 py-3 pt-10 pointer-events-none select-none"
         style={{
           background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 55%, transparent 100%)',
         }}
@@ -41,12 +41,17 @@ export default function GuidanceMarquee() {
   const dragStartRef = useRef({ x: 0, scrollLeft: 0 });
   const resumeTimerRef = useRef(null);
 
-  const pauseAuto = useCallback((ms = 4000) => {
+  const pauseAuto = useCallback((ms = 3500) => {
     pausedRef.current = true;
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
     resumeTimerRef.current = setTimeout(() => {
       pausedRef.current = false;
     }, ms);
+  }, []);
+
+  const loopScroll = useCallback((el) => {
+    const half = el.scrollWidth / 2;
+    if (half > 0 && el.scrollLeft >= half - 1) el.scrollLeft -= half;
   }, []);
 
   useEffect(() => {
@@ -57,17 +62,18 @@ export default function GuidanceMarquee() {
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault();
         el.scrollLeft += e.deltaY;
+        loopScroll(el);
         pauseAuto();
       }
     };
+
     el.addEventListener('wheel', handleWheel, { passive: false });
 
     let raf = 0;
     const tick = () => {
-      if (!pausedRef.current && !draggingRef.current) {
-        el.scrollLeft += 0.6;
-        const half = el.scrollWidth / 2;
-        if (half > 0 && el.scrollLeft >= half) el.scrollLeft -= half;
+      if (!pausedRef.current && !draggingRef.current && el.scrollWidth > el.clientWidth + 1) {
+        el.scrollLeft += 0.7;
+        loopScroll(el);
       }
       raf = requestAnimationFrame(tick);
     };
@@ -78,7 +84,7 @@ export default function GuidanceMarquee() {
       cancelAnimationFrame(raf);
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
     };
-  }, [pauseAuto]);
+  }, [pauseAuto, loopScroll]);
 
   const onPointerDown = (e) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -101,16 +107,17 @@ export default function GuidanceMarquee() {
   const endDrag = (e) => {
     if (!draggingRef.current) return;
     draggingRef.current = false;
-    scrollRef.current?.classList.remove('is-dragging');
-    scrollRef.current?.releasePointerCapture(e.pointerId);
+    const el = scrollRef.current;
+    el?.classList.remove('is-dragging');
+    if (el?.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
+    loopScroll(el);
     pauseAuto();
   };
 
   const onScroll = () => {
     const el = scrollRef.current;
     if (!el || draggingRef.current) return;
-    const half = el.scrollWidth / 2;
-    if (half > 0 && el.scrollLeft >= half) el.scrollLeft -= half;
+    loopScroll(el);
   };
 
   return (
@@ -128,33 +135,29 @@ export default function GuidanceMarquee() {
           <p className="mt-4 text-base max-w-xl mx-auto" style={{ color: 'var(--text-muted)' }}>
             Professionals across India used NexusCareer to plan their next move.
           </p>
-          <p className="mt-2 text-xs" style={{ color: 'var(--text-faint)' }}>
-            Drag, scroll, or swipe to browse · auto-scrolls when idle
-          </p>
         </Reveal>
       </div>
 
       <Reveal>
-        <div className="guidance-marquee-mask relative">
+        <div className="guidance-marquee-mask">
           <div
             ref={scrollRef}
-            className="guidance-marquee-scroll flex items-stretch gap-4 w-max"
+            className="guidance-marquee-scroll"
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
-            onPointerLeave={endDrag}
             onScroll={onScroll}
-            onMouseEnter={() => { pausedRef.current = true; }}
-            onMouseLeave={() => pauseAuto(800)}
-            onTouchStart={() => pauseAuto(6000)}
+            onTouchStart={() => pauseAuto(5000)}
             role="region"
-            aria-label="People who took guidance — scroll horizontally"
+            aria-label="People who took guidance"
             tabIndex={0}
           >
-            {loop.map((person, i) => (
-              <PersonCard key={`${person.id}-${i}`} person={person} />
-            ))}
+            <div className="guidance-marquee-track flex items-stretch gap-4">
+              {loop.map((person, i) => (
+                <PersonCard key={`${person.id}-${i}`} person={person} />
+              ))}
+            </div>
           </div>
         </div>
       </Reveal>
