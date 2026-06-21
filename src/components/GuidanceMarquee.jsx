@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useRef } from 'react';
 import Reveal from './Reveal';
 import { GUIDANCE_USERS } from '../data/guidanceUsers';
 
 function PersonCard({ person }) {
   return (
     <article
-      className="guidance-card flex-shrink-0 relative overflow-hidden rounded-2xl snap-center"
+      className="guidance-card flex-shrink-0 relative overflow-hidden rounded-2xl"
       style={{
         width: '168px',
         height: '220px',
@@ -35,90 +34,6 @@ function PersonCard({ person }) {
 
 export default function GuidanceMarquee() {
   const loop = [...GUIDANCE_USERS, ...GUIDANCE_USERS];
-  const scrollRef = useRef(null);
-  const pausedRef = useRef(false);
-  const draggingRef = useRef(false);
-  const dragStartRef = useRef({ x: 0, scrollLeft: 0 });
-  const resumeTimerRef = useRef(null);
-
-  const pauseAuto = useCallback((ms = 3500) => {
-    pausedRef.current = true;
-    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
-    resumeTimerRef.current = setTimeout(() => {
-      pausedRef.current = false;
-    }, ms);
-  }, []);
-
-  const loopScroll = useCallback((el) => {
-    const half = el.scrollWidth / 2;
-    if (half > 0 && el.scrollLeft >= half - 1) el.scrollLeft -= half;
-  }, []);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return undefined;
-
-    const handleWheel = (e) => {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        el.scrollLeft += e.deltaY;
-        loopScroll(el);
-        pauseAuto();
-      }
-    };
-
-    el.addEventListener('wheel', handleWheel, { passive: false });
-
-    let raf = 0;
-    const tick = () => {
-      if (!pausedRef.current && !draggingRef.current && el.scrollWidth > el.clientWidth + 1) {
-        el.scrollLeft += 0.7;
-        loopScroll(el);
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-
-    return () => {
-      el.removeEventListener('wheel', handleWheel);
-      cancelAnimationFrame(raf);
-      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
-    };
-  }, [pauseAuto, loopScroll]);
-
-  const onPointerDown = (e) => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    const el = scrollRef.current;
-    if (!el) return;
-    draggingRef.current = true;
-    pausedRef.current = true;
-    dragStartRef.current = { x: e.clientX, scrollLeft: el.scrollLeft };
-    el.setPointerCapture(e.pointerId);
-    el.classList.add('is-dragging');
-  };
-
-  const onPointerMove = (e) => {
-    if (!draggingRef.current) return;
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollLeft = dragStartRef.current.scrollLeft - (e.clientX - dragStartRef.current.x);
-  };
-
-  const endDrag = (e) => {
-    if (!draggingRef.current) return;
-    draggingRef.current = false;
-    const el = scrollRef.current;
-    el?.classList.remove('is-dragging');
-    if (el?.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
-    loopScroll(el);
-    pauseAuto();
-  };
-
-  const onScroll = () => {
-    const el = scrollRef.current;
-    if (!el || draggingRef.current) return;
-    loopScroll(el);
-  };
 
   return (
     <section
@@ -140,19 +55,7 @@ export default function GuidanceMarquee() {
 
       <Reveal>
         <div className="guidance-marquee-mask">
-          <div
-            ref={scrollRef}
-            className="guidance-marquee-scroll"
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={endDrag}
-            onPointerCancel={endDrag}
-            onScroll={onScroll}
-            onTouchStart={() => pauseAuto(5000)}
-            role="region"
-            aria-label="People who took guidance"
-            tabIndex={0}
-          >
+          <div className="guidance-marquee-viewport" role="region" aria-label="People who took guidance">
             <div className="guidance-marquee-track flex items-stretch gap-4">
               {loop.map((person, i) => (
                 <PersonCard key={`${person.id}-${i}`} person={person} />
