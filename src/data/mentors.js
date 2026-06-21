@@ -1,0 +1,77 @@
+// Mentor profiles
+export const MENTORS = [
+  {
+    id: 1,
+    name: 'Priya Sharma',
+    title: 'Senior Engineering Manager',
+    company: 'Google',
+    experience: 12,
+    expertise: ['Software Engineering', 'System Design', 'Career Growth'],
+    rating: 4.9,
+    reviews: 156,
+    available: true,
+    bio: 'Former startup founder turned Google EM. Passionate about helping engineers navigate their career paths and build impactful products.',
+    avatar: 'PS',
+  },
+  {
+    id: 2,
+    name: 'Rahul Verma',
+    title: 'Principal Data Scientist',
+    company: 'Microsoft',
+    experience: 10,
+    expertise: ['Data Science', 'Machine Learning', 'AI Strategy'],
+    rating: 4.8,
+    reviews: 124,
+    available: true,
+    bio: 'PhD in ML from IIT Delhi. Built AI products used by millions. Love mentoring the next generation of data leaders.',
+    avatar: 'RV',
+  },
+  {
+    id: 3,
+    name: 'Ananya Reddy',
+    title: 'VP of Product',
+    company: 'Flipkart',
+    experience: 14,
+    expertise: ['Product Management', 'E-commerce', 'Leadership'],
+    rating: 4.9,
+    reviews: 198,
+    available: false,
+    bio: 'Product leader with experience across Amazon, Swiggy, and Flipkart. Expert in 0-1 product building and scaling.',
+    avatar: 'AR',
+  },
+  {
+    id: 4,
+    name: 'Vikram Singh',
+    title: 'Design Director',
+    company: 'Razorpay',
+    experience: 11,
+    expertise: ['UX Design', 'Design Systems', 'Fintech'],
+    rating: 4.7,
+    reviews: 89,
+    available: true,
+    bio: 'Built design teams at multiple unicorns. Specializes in fintech UX and creating world-class design cultures.',
+    avatar: 'VS',
+  },
+];
+
+// Testimonials
+export const TESTIMONIALS = [
+  {
+    quote: "NexusCareer helped me transition from a confused BCA graduate to landing my dream job at Google. The personalized roadmap was a game-changer!",
+    author: "Arjun Mehta",
+    transition: "BCA Graduate → Google SWE",
+    rating: 5,
+  },
+  {
+    quote: "I was stuck in a dead-end sales job. NexusCareer identified my hidden potential in product management. Now I'm a PM at Razorpay!",
+    author: "Sneha Patel",
+    transition: "Sales Executive → Razorpay PM",
+    rating: 5,
+  },
+  {
+    quote: "The skill gap analyzer showed me exactly what I was missing. 6 months later, I cracked my first data science role at Amazon.",
+    author: "Karthik Iyer",
+    transition: "Mechanical Engineer → Amazon Data Scientist",
+    rating: 5,
+  },
+];
